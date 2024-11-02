@@ -1,26 +1,31 @@
-// Import necessary modules
-require('dotenv').config(); // Load environment variables
-const express = require('express'); // Import Express
-const cors = require('cors'); // Enable CORS
-const connectDB = require('./config/database'); // Import database connection
-const routes = require('./routes'); // Import routes
+// server.js
 
-// Initialize Express app
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./config/database');
+const apiRoutes = require('./routes'); // Import base API routes
+require('dotenv').config();
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Apply middleware
-app.use(cors({ origin: 'https://blitzprotocol.org', credentials: true })); // Set CORS policy
-app.use(express.json({ limit: '50mb' })); // Parse JSON with 50MB limit
-app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Parse URL-encoded with limit
+app.use(cors({
+    origin: 'https://blitzprotocol.org',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Connect to the database
 connectDB();
 
-// Set up routes
-app.use('/api', routes); // Use the routes from the routes folder
+// Base route for API
+app.use('/api', apiRoutes);
 
-// Start server
+// Start the server
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });

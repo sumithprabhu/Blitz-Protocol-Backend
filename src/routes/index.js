@@ -1,14 +1,18 @@
+// routes/index.js
+
 const express = require('express');
+const userRoutes = require('./api/userRoutes');
+const blitzRoutes = require('./api/blitzRoutes');
+const graphql = require('./api/graphql');
+
 const router = express.Router();
 
-// Import specific route modules
-const userRoutes = require('./userRoutes');
-const blitzRoutes = require('./blitzRoutes');
-const graphQLRoutes = require('./graphQLRoutes');
+// RESTful routes
+router.use('/user', userRoutes); // Now only affects /api/user routes
+router.use('/blitz', blitzRoutes); // Now only affects /api/blitz routes
 
-// Set up route modules
-router.use('/users', userRoutes); // User-related routes, e.g., /api/users
-router.use('/blitz', blitzRoutes); // Blitz-related routes, e.g., /api/blitz
-router.use('/graphql', graphQLRoutes); // GraphQL routes, e.g., /api/graphql
+// GraphQL route with API key and contract address validation
+// GraphQL route (e.g., `/api/graphql/:contractAddress`)
+router.use('/v1', graphql);
 
 module.exports = router;
