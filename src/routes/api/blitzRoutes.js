@@ -27,13 +27,39 @@ router.post('/register', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const blitzRecords = await Blitz.find({}).lean();
-        return res.status(200).json(blitzRecords);
+        // Get page and limit from query parameters or set default values
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        // Calculate the number of documents to skip
+        const skip = (page - 1) * limit;
+
+        // Fetch the paginated data
+        const blitzRecords = await Blitz.find({})
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        // Count total number of documents
+        const totalDocuments = await Blitz.countDocuments({});
+        const totalPages = Math.ceil(totalDocuments / limit);
+
+        // Send response with paginated data and additional pagination information
+        return res.status(200).json({
+            blitzRecords,
+            pagination: {
+                totalDocuments,
+                totalPages,
+                currentPage: page,
+                limit
+            }
+        });
     } catch (error) {
         console.error('Error fetching Blitz records:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 router.get('/:id', async (req, res) => {
     try {
